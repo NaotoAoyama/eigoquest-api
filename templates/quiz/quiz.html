@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>クイズ挑戦中！ - EigoQuest</title>
+    <style>
+        body { font-family: sans-serif; line-height: 1.6; }
+        .quiz-container { max-width: 800px; margin: 20px auto; padding: 20px; border: 1px solid #ccc; border-radius: 8px; }
+        .question-block { margin-bottom: 25px; border-bottom: 1px solid #eee; padding-bottom: 15px; }
+        .question-text { font-weight: bold; font-size: 1.2em; }
+        .options { list-style-type: none; padding-left: 10px; }
+        .options li { margin: 5px 0; }
+    </style>
+</head>
+<body>
+
+    <div class="quiz-container">
+        <h1>ランダム10問クイズ</h1>
+        <p>
+            <a href="{% url 'quiz:index' %}">トップに戻る</a>
+            </p>
+
+        <hr>
+
+        <ol>
+            {% for question in questions %}
+            <li class="question-block">
+                <div class="question-text">{{ question.question_text|linebreaks }}</div>
+
+                <ul class="options">
+                    <li>(A) {{ question.option_a }}</li>
+                    <li>(B) {{ question.option_b }}</li>
+                    <li>(C) {{ question.option_c }}</li>
+                    <li>(D) {{ question.option_d }}</li>
+                </ul>
+
+                <div style="background-color: #f0f0f0; padding: 5px; font-size: 0.9em;">
+                    <strong>開発用ヒント:</strong>
+                    正解: {{ question.correct_answer }} / 
+                    解説: {{ question.explanation|linebreaks }}
+                </div>
+            </li>
+            {% endfor %}
+        </ol>
+    </div>
+
+</body>
+</html>
