@@ -1,6 +1,6 @@
 # quiz/admin.py
 from django.contrib import admin
-from .models import Question  # 1. Question モデルをインポート
+from .models import Question, Result  # 1. Question モデルをインポート
 
 # 2. (推奨) 管理画面での表示をカスタマイズするクラスを作成
 class QuestionAdmin(admin.ModelAdmin):
@@ -18,3 +18,12 @@ class QuestionAdmin(admin.ModelAdmin):
 
 # 3. 管理画面に Question モデルを登録 (カスタマイズした QuestionAdmin も一緒に)
 admin.site.register(Question, QuestionAdmin)
+
+
+class ResultAdmin(admin.ModelAdmin):
+    list_display = ('id', 'user', 'question', 'selected_answer', 'is_correct', 'answered_at')
+    list_filter = ('user', 'is_correct', 'answered_at')
+    search_fields = ('user__username', 'question__question_text') # 連携先のフィールドも検索可能
+
+# 3. Result モデルを管理画面に登録
+admin.site.register(Result, ResultAdmin)

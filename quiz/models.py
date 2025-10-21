@@ -1,4 +1,5 @@
 from django.db import models
+from django.contrib.auth.models import User
 
 class Question(models.Model):
     """
@@ -47,3 +48,39 @@ class Question(models.Model):
         # 管理画面での表示名を指定
         verbose_name = "問題"
         verbose_name_plural = "問題一覧"
+
+
+class Result(models.Model):
+    """
+    ユーザーの解答履歴を保存するモデル
+    """
+    
+    # 1. ユーザーとの連携 (ForeignKey)
+    # どのユーザーが答えたか？
+    # Userモデルが削除されたら、この解答履歴も一緒に削除する (CASCADE)
+    user = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name="解答者")
+    
+    # 2. 問題との連携 (ForeignKey)
+    # どの問題に答えたか？
+    # Questionモデルが削除されたら、この解答履歴も一緒に削除する (CASCADE)
+    question = models.ForeignKey(Question, on_delete=models.CASCADE, verbose_name="対象問題")
+    
+    # 3. ユーザーの選択
+    selected_answer = models.CharField(max_length=1, choices=Question.ANSWER_CHOICES, verbose_name="ユーザーの選択")
+    
+    # 4. 正誤判定
+    is_correct = models.BooleanField(default=False, verbose_name="正解フラグ")
+    
+    answered_at = models.DateTimeField(auto_now_add=True, verbose_name="解答日時")
+
+    def __str__(self):
+        return f"{self.user.username} -> {self.question.id} (正解: {self.is_correct})"
+
+    class Meta:
+        verbose_name = "解答履歴"
+        verbose_name_plural = "解答履歴一覧"
+        
+        # (推奨) 1ユーザーが1問題に1回だけ答えられるように制約
+        constraints = [
+            models.UniqueConstraint(fields=['user', 'question'], name='unique_user_question')
+        ]
