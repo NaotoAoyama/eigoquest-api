@@ -11,7 +11,14 @@
     <nav>
         {% if user.is_authenticated %}
             こんにちは, <strong>{{ user.username }}</strong> さん | 
-            <a href="{% url 'accounts:logout' %}">ログアウト</a>
+
+            <form action="{% url 'accounts:logout' %}" method="POST" style="display: inline;">
+                {% csrf_token %}
+                <button type="submit" style="background: none; border: none; padding: 0; color: blue; text-decoration: underline; cursor: pointer; font-size: inherit;">
+                    ログアウト
+                </button>
+            </form>
+
         {% else %}
             <a href="{% url 'accounts:login' %}">ログイン</a> | 
             <a href="{% url 'accounts:signup' %}">新規登録</a>
