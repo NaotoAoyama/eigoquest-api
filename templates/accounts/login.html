@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <title>ログイン - EigoQuest</title>
+    <style>
+        body { font-family: sans-serif; display: grid; place-items: center; min-height: 80vh; }
+        form { border: 1px solid #ccc; padding: 25px; border-radius: 8px; }
+        div { margin-bottom: 15px; }
+        label { display: block; margin-bottom: 5px; }
+        input[type="text"], input[type="password"] { width: 300px; padding: 8px; }
+        button { padding: 10px 15px; }
+    </style>
+</head>
+<body>
+    <div>
+        <h2>ログイン</h2>
+        <form method="post">
+            {% csrf_token %}
+            {{ form.as_p }}
+            <button type="submit">ログイン</button>
+        </form>
+        <p>アカウントをお持ちでないですか？ <a href="{% url 'accounts:signup' %}">新規登録</a></p>
+        <p><a href="{% url 'quiz:index' %}">トップに戻る</a></p>
+    </div>
+</body>
+</html>

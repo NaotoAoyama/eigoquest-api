@@ -22,4 +22,5 @@ urlpatterns = [
     # トップページ ('') へのアクセスが来たら、
     # quizアプリ内の urls.py を見に行くよう設定
     path('', include('quiz.urls')),
+    path('accounts/', include('accounts.urls')),
 ]

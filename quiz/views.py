@@ -2,6 +2,7 @@ from django.views.generic import TemplateView, ListView
 from .models import Question, Result
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.shortcuts import redirect
+from django.urls import reverse_lazy
 
 
 class IndexView(TemplateView):
@@ -21,8 +22,7 @@ class QuizView(LoginRequiredMixin, ListView):
     context_object_name = 'questions' # 3. HTML側に渡す変数名 (default: object_list)
 
     # ログインしていない場合の転送先 (開発中は管理画面のログインが便利)
-    login_url = '/admin/login/'
-
+    login_url = reverse_lazy('accounts:login')
     def get_queryset(self):
         """
         クエリセットをカスタマイズして、ランダムな10件を取得する
@@ -82,7 +82,7 @@ class QuizResultView(LoginRequiredMixin, ListView):
     model = Result
     template_name = 'quiz/quiz_result.html'
     context_object_name = 'results'
-    login_url = '/admin/login/'
+    login_url = reverse_lazy('accounts:login')
 
     def get_queryset(self):
         # セッションから採点した Result の ID リストを取得

@@ -1,13 +1,26 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>EigoQuest (仮)</title>
-</head>
+    </head>
 <body>
+
+    <nav style="background-color: #f4f4f4; padding: 10px; text-align: right;">
+        {% if user.is_authenticated %}
+            こんにちは, <strong>{{ user.username }}</strong> さん | 
+            <a href="{% url 'accounts:logout' %}">ログアウト</a>
+        {% else %}
+            <a href="{% url 'accounts:login' %}">ログイン</a> | 
+            <a href="{% url 'accounts:signup' %}">新規登録</a>
+        {% endif %}
+    </nav>
     <h1>EigoQuest へようこそ！</h1>
     <p>TOEICレベルの英語問題に挑戦できるサイトです。</p>
 
-    </body>
+    <p>
+        <a href="{% url 'quiz:quiz_page' %}" style="font-size: 1.2em; padding: 10px 20px; background-color: green; color: white; text-decoration: none;">
+            クイズ開始 (10問)
+        </a>
+    </p>
+
+</body>
 </html>
