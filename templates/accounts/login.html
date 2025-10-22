@@ -1,19 +1,12 @@
-<!DOCTYPE html>
+{% load static %} <!DOCTYPE html>
 <html lang="ja">
 <head>
     <meta charset="UTF-8">
     <title>ログイン - EigoQuest</title>
-    <style>
-        body { font-family: sans-serif; display: grid; place-items: center; min-height: 80vh; }
-        form { border: 1px solid #ccc; padding: 25px; border-radius: 8px; }
-        div { margin-bottom: 15px; }
-        label { display: block; margin-bottom: 5px; }
-        input[type="text"], input[type="password"] { width: 300px; padding: 8px; }
-        button { padding: 10px 15px; }
-    </style>
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
 </head>
-<body>
-    <div>
+<body class="form-container">
+    <div class="form-box">
         <h2>ログイン</h2>
         <form method="post">
             {% csrf_token %}

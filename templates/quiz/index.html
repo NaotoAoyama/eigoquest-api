@@ -1,10 +1,14 @@
-<!DOCTYPE html>
+{% load static %} <!DOCTYPE html>
 <html lang="ja">
 <head>
-    </head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EigoQuest (仮)</title>
+    <link rel="stylesheet" href="{% static 'css/style.css' %}"> 
+</head>
 <body>
 
-    <nav style="background-color: #f4f4f4; padding: 10px; text-align: right;">
+    <nav>
         {% if user.is_authenticated %}
             こんにちは, <strong>{{ user.username }}</strong> さん | 
             <a href="{% url 'accounts:logout' %}">ログアウト</a>
@@ -13,14 +17,17 @@
             <a href="{% url 'accounts:signup' %}">新規登録</a>
         {% endif %}
     </nav>
-    <h1>EigoQuest へようこそ！</h1>
-    <p>TOEICレベルの英語問題に挑戦できるサイトです。</p>
-
-    <p>
-        <a href="{% url 'quiz:quiz_page' %}" style="font-size: 1.2em; padding: 10px 20px; background-color: green; color: white; text-decoration: none;">
-            クイズ開始 (10問)
-        </a>
-    </p>
+    
+    <div class="container">
+        <h1>EigoQuest へようこそ！</h1>
+        <p>TOEICレベルの英語問題に挑戦できるサイトです。</p>
+        
+        <p>
+            <a href="{% url 'quiz:quiz_page' %}" style="font-size: 1.2em; padding: 10px 20px; background-color: green; color: white; text-decoration: none;">
+                クイズ開始 (10問)
+            </a>
+        </p>
+    </div>
 
 </body>
 </html>

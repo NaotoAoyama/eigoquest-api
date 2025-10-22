@@ -132,3 +132,10 @@ LOGIN_REDIRECT_URL = '/'
 
 # ログアウト後のリダイレクト先 (トップページ)
 LOGOUT_REDIRECT_URL = '/'
+
+# 1. /static/ というURLで静的ファイルにアクセスする設定 
+STATIC_URL = 'static/'
+
+# 2. 追記: プロジェクト共通の静的ファイルを置く場所を指定
+# (templates と同じ階層に 'static' ディレクトリを作ります、という宣言)
+STATICFILES_DIRS = [BASE_DIR / 'static']

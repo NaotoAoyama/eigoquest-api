@@ -1,0 +1,84 @@
+/* static/css/style.css (新規作成) */
+
+/* 全体設定 */
+body {
+    font-family: sans-serif;
+    line-height: 1.6;
+    margin: 0;
+    padding: 0;
+    background-color: #f9f9f9;
+}
+
+/* ナビゲーションバー */
+nav {
+    background-color: #f4f4f4;
+    padding: 10px 20px;
+    text-align: right;
+    border-bottom: 1px solid #ddd;
+}
+
+/* メインのコンテナ (クイズ、結果、フォーム共通) */
+.container {
+    max-width: 800px;
+    margin: 20px auto;
+    padding: 25px;
+    background-color: #ffffff;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+}
+
+/* フォーム (ログイン・新規登録) */
+.form-container {
+    display: grid;
+    place-items: center;
+    min-height: 70vh;
+}
+.form-box {
+    border: 1px solid #ccc;
+    padding: 30px;
+    border-radius: 8px;
+    background-color: #fff;
+}
+.form-box div { margin-bottom: 15px; }
+.form-box label { display: block; margin-bottom: 5px; }
+.form-box input[type="text"],
+.form-box input[type="password"] {
+    width: 300px;
+    padding: 8px;
+}
+
+/* クイズ (quiz.html) */
+.question-block {
+    margin-bottom: 25px;
+    border-bottom: 1px solid #eee;
+    padding-bottom: 15px;
+}
+.question-text {
+    font-weight: bold;
+    font-size: 1.2em;
+}
+.options {
+    list-style-type: none;
+    padding-left: 10px;
+}
+.options li {
+    margin: 10px 0;
+}
+
+/* 結果 (quiz_result.html) */
+.score-summary {
+    text-align: center;
+    font-size: 1.5em;
+    font-weight: bold;
+    margin-bottom: 20px;
+    padding: 20px;
+    background-color: #f4f4f4;
+}
+.correct { color: green; font-weight: bold; }
+.incorrect { color: red; font-weight: bold; }
+.explanation {
+    background-color: #f9f9f9;
+    padding: 10px;
+    margin-top: 10px;
+    border-left: 5px solid #ddd;
+}

@@ -1,19 +1,12 @@
-<!DOCTYPE html>
+{% load static %} <!DOCTYPE html>
 <html lang="ja">
 <head>
     <meta charset="UTF-8">
     <title>新規登録 - EigoQuest</title>
-    <style>
-        /* login.html と同じスタイルを使用 */
-        body { font-family: sans-serif; display: grid; place-items: center; min-height: 80vh; }
-        form { border: 1px solid #ccc; padding: 25px; border-radius: 8px; }
-        ul { list-style-type: none; padding: 0; }
-        li { font-size: 0.9em; color: #555; }
-        button { padding: 10px 15px; margin-top: 10px; }
-    </style>
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
 </head>
-<body>
-    <div>
+<body class="form-container">
+    <div class="form-box">
         <h2>新規登録</h2>
         <form method="post">
             {% csrf_token %}
