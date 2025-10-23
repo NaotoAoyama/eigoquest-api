@@ -10,8 +10,10 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.2/ref/settings/
 """
 
+import os
 from pathlib import Path
 from decouple import config
+import dj_database_url
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -26,7 +28,18 @@ SECRET_KEY = config('SECRET_KEY')
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = config('DEBUG', default=False, cast=bool)
 
-ALLOWED_HOSTS = []
+# 許可するホスト名
+# Render の URL (例: eigoquest.onrender.com) とローカルホストを追加
+ALLOWED_HOSTS = [
+    '127.0.0.1',
+    config('RENDER_EXTERNAL_HOSTNAME', default=None) # Renderが自動で設定
+]
+# RENDER_EXTERNAL_HOSTNAME がある場合のみリストに追加
+if ALLOWED_HOSTS[1]:
+    ALLOWED_HOSTS.pop(1)
+    ALLOWED_HOSTS.append(config('RENDER_EXTERNAL_HOSTNAME'))
+else:
+    ALLOWED_HOSTS.pop(1) # None を削除
 
 
 # Application definition
@@ -37,6 +50,7 @@ INSTALLED_APPS = [
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
+    'whitenoise.runserver_nostatic',
     'django.contrib.staticfiles',
     'quiz.apps.QuizConfig',
     'accounts.apps.AccountsConfig',
@@ -44,6 +58,7 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -76,14 +91,11 @@ WSGI_APPLICATION = 'config.wsgi.application'
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
 
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': config('DB_NAME'),
-        'USER': config('DB_USER'),
-        'PASSWORD': config('DB_PASSWORD'),
-        'HOST': config('DB_HOST'),
-        'PORT': config('DB_PORT', default=5432, cast=int),
-    }
+    'default': dj_database_url.config(
+        # .env ファイルの DB_... 設定をフォールバックとして使用
+        default=f"postgres://{config('DB_USER')}:{config('DB_PASSWORD')}@{config('DB_HOST')}:{config('DB_PORT')}/{config('DB_NAME')}",
+        conn_max_age=600
+    )
 }
 
 # Password validation
@@ -139,3 +151,13 @@ STATIC_URL = 'static/'
 # 2. 追記: プロジェクト共通の静的ファイルを置く場所を指定
 # (templates と同じ階層に 'static' ディレクトリを作ります、という宣言)
 STATICFILES_DIRS = [BASE_DIR / 'static']
+
+
+STATIC_URL = 'static/'
+STATICFILES_DIRS = [BASE_DIR / 'static']
+
+# 追記 (collectstatic の実行場所)
+STATIC_ROOT = BASE_DIR / 'staticfiles' 
+
+# 追記 (WhiteNoise のための設定)
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
