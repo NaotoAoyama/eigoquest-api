@@ -102,14 +102,15 @@ class QuizResultView(LoginRequiredMixin, ListView):
         context = super().get_context_data(**kwargs)
         
         # context['results'] (queryset) はDBから取得したまま
-        results_list = list(context['results'])
+        # 変更前（QuerySetを消費してしまう）:
+        # results_list = list(context['results'])
+        # correct_count = sum(1 for r in results_list if r.is_correct)
+        # total_count = len(results_list)
         
-        # 正解数を計算
-        correct_count = sum(1 for r in results_list if r.is_correct)
-        total_count = len(results_list)
-        
-        # context に追加
-        context['correct_count'] = correct_count
-        context['total_count'] = total_count
+        # 変更後（QuerySetを消費しない .count() を使う）:
+        # context['results'] には触らず、元のQuerySet（get_queryset()）に対して集計
+        results_qs = self.get_queryset()
+        context['correct_count'] = results_qs.filter(is_correct=True).count()
+        context['total_count'] = results_qs.count()
         
         return context
