@@ -1,7 +1,7 @@
 from django.views.generic import TemplateView, ListView
 from .models import Question, Result
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.shortcuts import redirect
+from django.shortcuts import redirect, render
 from django.urls import reverse_lazy
 
 
@@ -23,13 +23,18 @@ class QuizView(LoginRequiredMixin, ListView):
 
     # ログインしていない場合の転送先 (開発中は管理画面のログインが便利)
     login_url = reverse_lazy('accounts:login')
+
+
     def get_queryset(self):
-        """
-        クエリセットをカスタマイズして、ランダムな10件を取得する
-        """
-        # Question.objects.order_by('?') でランダムに並び替え、
-        # [:10] で最初の10件を取得する
-        queryset = super().get_queryset().order_by('?')[:10]
+
+        # queryset = super().get_queryset().order_by('?')[:10]
+        
+    
+        # 変更後 (デバッグ用):
+        # ランダム化と10件制限を一時的に停止し、全件取得を試みる
+        print("DEBUG: get_queryset を全件取得で実行中") # (Renderのログ確認用)
+        queryset = super().get_queryset()
+
         return queryset
     
     def post(self, request, *args, **kwargs):
