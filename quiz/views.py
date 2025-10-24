@@ -26,20 +26,10 @@ class QuizView(LoginRequiredMixin, ListView):
 
 
     def get_queryset(self):
-        """
-        クエリセットをカスタマイズして、ランダムな10件を取得する
-        """
-        
-        # 変更前 (デバッグ用コード):
-        # print("DEBUG: get_queryset を全件取得で実行中") 
-        # queryset = super().get_queryset()
-        
-        # 変更後 (元のコード):
-        # Question.objects.order_by('?') でランダムに並び替え、
-        # [:10] で最初の10件を取得する
         queryset = super().get_queryset().order_by('?')[:10]
-        
+
         return queryset
+
     
     def post(self, request, *args, **kwargs):
         user = request.user
