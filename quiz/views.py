@@ -3,6 +3,7 @@ from .models import Question, Result
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.shortcuts import redirect, render
 from django.urls import reverse_lazy
+from django.db.models import Case, When
 
 
 class IndexView(TemplateView):
@@ -14,65 +15,74 @@ class IndexView(TemplateView):
 
 
 class QuizView(LoginRequiredMixin, ListView):
-    """
-    ランダムなクイズ問題を10問表示する
-    """
-    model = Question               # 1. どのモデルからデータを取得するか
-    template_name = 'quiz/quiz.html'    # 2. どのHTMLを使って表示するか
-    context_object_name = 'questions' # 3. HTML側に渡す変数名 (default: object_list)
-
-    # ログインしていない場合の転送先 (開発中は管理画面のログインが便利)
-    login_url = reverse_lazy('accounts:login')
-
+    model = Question
+    template_name = 'quiz/quiz.html'
+    context_object_name = 'questions'
+    login_url = reverse_lazy('accounts:login') 
 
     def get_queryset(self):
+        """
+        クエリセットをカスタマイズして、ランダムな10件を取得する
+        （DB負荷を考慮し、キャッシュは使用しない元のロジックに戻す）
+        """
         queryset = super().get_queryset().order_by('?')[:10]
-
         return queryset
 
-    
     def post(self, request, *args, **kwargs):
+        """
+        解答（POST）を処理する
+        """
         user = request.user
         
-        # セッションに保存する、採点結果IDのリスト
-        result_ids = []
-
-        # フォームから送られてきたデータをループ処理
-        # (例: 'question_5': 'A', 'question_12': 'C', ...)
-        for key, value in request.POST.items():
-            if key.startswith('question_'):
-                # 'question_5' から '5' (ID) を取り出す
-                question_id = int(key.split('_')[1])
-                selected_answer = value
-
-                try:
-                    question = Question.objects.get(id=question_id)
-                    
-                    # 正誤判定
-                    is_correct = (selected_answer == question.correct_answer)
-                    
-                    # 解答履歴 (Result) をDBに保存
-                    # 既に同じ問題に答えていたら更新、なければ新規作成
-                    result, created = Result.objects.update_or_create(
-                        user=user,
-                        question=question,
-                        defaults={
-                            'selected_answer': selected_answer,
-                            'is_correct': is_correct
-                        }
-                    )
-                    result_ids.append(result.id)
-
-                except Question.DoesNotExist:
-                    # (万が一問題IDが存在しなかった場合の処理)
-                    continue
+        # 変更点: POSTデータ（request.POST）に含まれるキーを基準に処理する
+        # (例: 'question_5', 'question_12', ...)
         
-        # 採点した結果のIDリストをセッションに保存
-        request.session['latest_result_ids'] = result_ids
+        result_ids = []
+        question_id_map = {} # POSTされてきた順番を保持するための辞書 {id: 順序}
 
-        # 結果表示ページ (これから作成) にリダイレクト
+        # 1. POSTデータから、解答された Question の IDリスト と 順序 を抽出
+        order_index = 0
+        for key in request.POST.keys():
+            if key.startswith('question_'):
+                question_id = int(key.split('_')[1])
+                question_id_map[question_id] = order_index
+                order_index += 1
+        
+        question_ids = list(question_id_map.keys())
+
+        if not question_ids:
+            # 解答が一つも送られてこなかった場合
+            return redirect('quiz:index') # トップに戻す
+
+        # 2. DBからPOSTされたIDの Question をすべて取得
+        questions_answered = Question.objects.filter(id__in=question_ids)
+
+        # 3. DBから取得した Question を、POSTされた順序（=表示順）に並び替える
+        preserved_order = Case(
+            *[When(id=id_val, then=pos) for id_val, pos in question_id_map.items()]
+        )
+        questions_in_order = questions_answered.order_by(preserved_order)
+
+        # 4. 並び替えた順序で採点し、Result ID をセッションに保存
+        for question in questions_in_order:
+            selected_answer = request.POST.get(f'question_{question.id}')
+            
+            is_correct = (selected_answer == question.correct_answer)
+            
+            result, created = Result.objects.update_or_create(
+                user=user,
+                question=question,
+                defaults={
+                    'selected_answer': selected_answer,
+                    'is_correct': is_correct
+                }
+            )
+            # 表示された順（POSTされた順）に Result ID をリストに追加
+            result_ids.append(result.id)
+
+        # 5. 結果ページへリダイレクト
+        request.session['latest_result_ids'] = result_ids
         return redirect('quiz:result_page')
-    
 
 class QuizResultView(LoginRequiredMixin, ListView):
     """
@@ -84,16 +94,20 @@ class QuizResultView(LoginRequiredMixin, ListView):
     login_url = reverse_lazy('accounts:login')
 
     def get_queryset(self):
-        # セッションから採点した Result の ID リストを取得
         result_ids = self.request.session.get('latest_result_ids', [])
         
-        # ID リストに該当する Result のみを取得
-        # 関連する Question も事前に取得 (select_related) してDB負荷を下げる
-        queryset = Result.objects.filter(id__in=result_ids).select_related('question')
+        if not result_ids:
+            return Result.objects.none() # IDがなければ空を返す
+
+        # 変更点: セッションに保存されたIDリストの順序を保持する order_by を追加
         
-        # (セッションからデータを削除しても良いが、リロード対応のため残す)
-        # if 'latest_result_ids' in self.request.session:
-        #     del self.request.session['latest_result_ids']
+        # 1. Case...When... を使って、IDリストの順序をDBの並び順として定義
+        preserved_order = Case(
+            *[When(id=id_val, then=pos) for pos, id_val in enumerate(result_ids)]
+        )
+        
+        # 2. filter で絞り込み、order_by で 1. の順序を適用
+        queryset = Result.objects.filter(id__in=result_ids).select_related('question').order_by(preserved_order)
             
         return queryset
 
