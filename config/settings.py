@@ -54,12 +54,15 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'quiz.apps.QuizConfig',
     'accounts.apps.AccountsConfig',
+    'rest_framework',
+    'corsheaders',
 ]
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
@@ -161,3 +164,15 @@ STATIC_ROOT = BASE_DIR / 'staticfiles'
 
 # 追記 (WhiteNoise のための設定)
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+
+# CORS (Cross-Origin Resource Sharing) の設定
+# Vue.js の開発サーバーからのアクセスを許可する
+CORS_ALLOWED_ORIGINS = [
+    'http://localhost:5173', # Vue.js のデフォルト開発サーバー
+]
+
+# (将来的には、ここにVercelなどの本番フロントエンドURLも追加する)
+# CORS_ALLOWED_ORIGINS = [
+#     'http://localhost:5173',
+#     'https://eigoquest-frontend.vercel.app', 
+# ]
