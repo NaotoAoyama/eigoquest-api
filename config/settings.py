@@ -176,3 +176,20 @@ CORS_ALLOWED_ORIGINS = [
 #     'http://localhost:5173',
 #     'https://eigoquest-frontend.vercel.app', 
 # ]
+
+CORS_ALLOW_CREDENTIALS = True
+
+# 開発環境 (DEBUG=True) で、異なるポート (5173 と 8000) 間でも
+# セッションクッキーを送信できるようにするための設定
+if DEBUG:
+    SESSION_COOKIE_SAMESITE = 'None' # クッキーを異なるオリジンにも送信
+    SESSION_COOKIE_SECURE = True     # 'None' にするには Secure 属性が必須 (HTTPSが必要だが開発用サーバーはHTTP...)
+    # ↓ 開発サーバー (HTTP) でも 'None' を許可するための特別な設定 (本番では不要)
+    CSRF_COOKIE_SAMESITE = 'None' 
+    CSRF_COOKIE_SECURE = True 
+    # ↓ Django 4.1以降ではこれも必要
+    SESSION_COOKIE_DOMAIN = None
+    CSRF_COOKIE_DOMAIN = None
+    # ↓ お使いのブラウザによっては、localhost/127.0.0.1 間の Cookie 送信にこれらが必要な場合がある
+    # SESSION_COOKIE_DOMAIN = '127.0.0.1'
+    # CSRF_COOKIE_DOMAIN = '127.0.0.1'
