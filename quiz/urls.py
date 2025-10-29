@@ -10,4 +10,9 @@ urlpatterns = [
     # 変更前: path('quiz/', views.QuizView.as_view(), name='quiz_page'),
     # 変更後:
     path('api/quiz/', views.QuizAPIView.as_view(), name='quiz_api'),
+    
+    # 採点API (POST)
+    path('api/quiz/submit/', views.QuizSubmitAPIView.as_view(), name='quiz_submit_api'),
+    # 結果取得API (GET)
+    path('api/results/', views.QuizResultAPIView.as_view(), name='quiz_result_api'),
 ]

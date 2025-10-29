@@ -16,6 +16,10 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, include
+from rest_framework_simplejwt.views import (
+    TokenObtainPairView,
+    TokenRefreshView,
+)
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -23,4 +27,8 @@ urlpatterns = [
     # quizアプリ内の urls.py を見に行くよう設定
     path('', include('quiz.urls')),
     path('accounts/', include('accounts.urls')),
+    # JWT トークン取得 (ログイン) API
+    path('api/token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
+    # JWT トークンリフレッシュ API
+    path('api/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
 ]

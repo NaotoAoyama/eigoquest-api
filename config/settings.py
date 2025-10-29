@@ -14,6 +14,7 @@ import os
 from pathlib import Path
 from decouple import config
 import dj_database_url
+from datetime import timedelta
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -56,6 +57,7 @@ INSTALLED_APPS = [
     'accounts.apps.AccountsConfig',
     'rest_framework',
     'corsheaders',
+    'rest_framework_simplejwt',
 ]
 
 MIDDLEWARE = [
@@ -193,3 +195,19 @@ if DEBUG:
     # ↓ お使いのブラウザによっては、localhost/127.0.0.1 間の Cookie 送信にこれらが必要な場合がある
     # SESSION_COOKIE_DOMAIN = '127.0.0.1'
     # CSRF_COOKIE_DOMAIN = '127.0.0.1'
+
+
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
+    ),
+    'DEFAULT_PERMISSION_CLASSES': (
+         # デフォルトでは認証が必要（APIView ごとに変更可能）
+        'rest_framework.permissions.IsAuthenticated',
+    )
+}
+
+SIMPLE_JWT = {
+    "ACCESS_TOKEN_LIFETIME": timedelta(minutes=60), # アクセストークンは60分有効
+    "REFRESH_TOKEN_LIFETIME": timedelta(days=1),   # リフレッシュトークンは1日有効
+}
