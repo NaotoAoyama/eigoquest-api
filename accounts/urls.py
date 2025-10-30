@@ -17,4 +17,7 @@ urlpatterns = [
     path('logout/', 
          auth_views.LogoutView.as_view(), 
          name='logout'),
+
+     # 新規登録API (POST)
+    path('api/signup/', views.SignUpAPIView.as_view(), name='signup_api'),
 ]
