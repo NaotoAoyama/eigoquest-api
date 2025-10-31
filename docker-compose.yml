@@ -1,0 +1,44 @@
+version: '3.8'
+
+services:
+  # 1. Django API サービス (名前: "api")
+  api:
+    # 今いるディレクトリにある Dockerfile を使ってビルドする
+    build: .
+    # 起動コマンド (開発サーバーをコンテナの 0.0.0.0:8000 で起動)
+    command: python3 manage.py runserver 0.0.0.0:8000
+    # ボリューム (ローカルのコード変更をコンテナに即時反映させる)
+    volumes:
+      - .:/app
+    # ポート (ローカルPCの 8000 番ポートを、コンテナの 8000 番ポートに接続)
+    ports:
+      - "8000:8000"
+    # 環境変数ファイル (ローカルの .env を読み込む)
+    env_file:
+      - ./.env
+    # 環境変数を上書き (DB_HOST を 'localhost' から 'db' に変更)
+    environment:
+      - DB_HOST=db
+    # 依存関係 ( "db" サービスが起動してから "api" を起動する)
+    depends_on:
+      - db
+
+  # 2. PostgreSQL データベースサービス (名前: "db")
+  db:
+    # PostgreSQL の公式イメージ (バージョン15の軽量版) を使用
+    image: postgres:15-alpine
+    # データベースのデータを永続化するためのボリューム
+    volumes:
+      - postgres_data:/var/lib/postgresql/data/
+    # 環境変数 (Djangoが接続するために必要な情報)
+    environment:
+      - POSTGRES_DB=${DB_NAME}
+      - POSTGRES_USER=${DB_USER}
+      - POSTGRES_PASSWORD=${DB_PASSWORD}
+    # コンテナ内部のポート (外部には公開しない)
+    ports:
+      - "5432"
+
+# 3. 永続化ボリュームの定義
+volumes:
+  postgres_data:

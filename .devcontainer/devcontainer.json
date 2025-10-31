@@ -1,0 +1,31 @@
+{
+  "name": "EigoQuest API (Dev Container)",
+
+  // 1. docker-compose.yml ファイルの場所を指定
+  "dockerComposeFile": [
+    "../docker-compose.yml" 
+  ],
+
+  // 2. 起動するサービス名を指定 (docker-compose.yml で定義した "api")
+  "service": "api",
+
+  // 3. VSCodeで開くワークスペースのパス
+  "workspaceFolder": "/app",
+
+  // 4. (任意) VSCodeに自動インストールさせたい拡張機能
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "ms-python.python",
+        "ms-python.vscode-pylance",
+        "batisteo.vscode-django"
+      ]
+    }
+  },
+
+  // 5. (任意) コンテナ作成後に自動実行するコマンド
+  // "postCreateCommand": "python3 manage.py migrate",
+
+  // 6. コンテナ内のユーザーを現在のローカルユーザーと一致させる (権限問題を防ぐ)
+  "remoteUser": "vscode"
+}
