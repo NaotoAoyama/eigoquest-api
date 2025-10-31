@@ -33,7 +33,8 @@ DEBUG = config('DEBUG', default=False, cast=bool)
 # Render の URL (例: eigoquest.onrender.com) とローカルホストを追加
 ALLOWED_HOSTS = [
     '127.0.0.1',
-    config('RENDER_EXTERNAL_HOSTNAME', default=None) # Renderが自動で設定
+    config('RENDER_EXTERNAL_HOSTNAME', default=None),# Renderが自動で設定
+    'eigoquest-frontend.vercel.app', # Vercelのドメイン名
 ]
 # RENDER_EXTERNAL_HOSTNAME がある場合のみリストに追加
 if ALLOWED_HOSTS[1]:
@@ -171,6 +172,7 @@ STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 # Vue.js の開発サーバーからのアクセスを許可する
 CORS_ALLOWED_ORIGINS = [
     'http://localhost:5173', # Vue.js のデフォルト開発サーバー
+    'eigoquest-frontend-qi5au7zey-naotoaoyamas-projects.vercel.app', # VercelのURL
 ]
 
 # (将来的には、ここにVercelなどの本番フロントエンドURLも追加する)
