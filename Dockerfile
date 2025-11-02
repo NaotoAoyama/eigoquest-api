@@ -8,7 +8,7 @@ ENV PYTHONUNBUFFERED 1         # Pythonのログをバッファせず、すぐ�
 # 3. OS (Debian) のパッケージリストを更新し、PostgreSQLクライアントをインストール
 # (psycopg2 のコンパイルに必要)
 RUN apt-get update \
-    && apt-get install -y --no-install-recommends gcc libpq-dev \
+    && apt-get install -y --no-install-recommends gcc libpq-dev build-essential \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 
